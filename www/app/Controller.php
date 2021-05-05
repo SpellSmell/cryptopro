@@ -24,7 +24,18 @@ class Controller {
       'certificates' => $this->getCertsInfo($certificates)
     ];
 
-    return $response->withJson($data);
+    return $response->withJson($this->utf8ize($data), 200, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+  }
+
+  private function utf8ize( $mixed ) {
+      if (is_array($mixed)) {
+          foreach ($mixed as $key => $value) {
+              $mixed[$key] = $this->utf8ize($value);
+          }
+      } elseif (is_string($mixed)) {
+          return mb_convert_encoding($mixed, "UTF-8", "UTF-8");
+      }
+      return $mixed;
   }
 
   public function unsign(Request $request, Response $response, array $args)
@@ -126,8 +137,6 @@ class Controller {
   {
     $CertFinder = new Certificate\Finder;
     $cert = $CertFinder->
-      findType($request->getQueryParams()['find_type'])->
-      query($request->getQueryParams()['query'])->
       fetch()->
       first();
     return $cert;
