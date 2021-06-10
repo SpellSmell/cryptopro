@@ -67,18 +67,20 @@ class Controller {
     // $signer->set_TSAAddress($address); // Опционально?
     $signer->set_Certificate($cert);
     $pin = $request->getQueryParams()['pin'];
+      $pin = 12345678;
     if(strlen($pin))
     {
       $signer->set_KeyPin($pin);
     }
 
     $sd = new \CPSignedData;
-    $sd->set_ContentEncoding(ENCODE_BINARY);
+    $sd->set_ContentEncoding(BASE64_TO_BINARY);
     $sd->set_Content(base64_encode($this->content));
 
     // Второй параметр - тип подписи(1 = CADES_BES):  http://cpdn.cryptopro.ru/default.asp?url=content/cades/namespace_c_ad_e_s_c_o_m_fe49883d8ff77f7edbeeaf0be3d44c0b_1fe49883d8ff77f7edbeeaf0be3d44c0b.html
     // Третий параметр detached - отделенная(true) или совмещенная (false)
-    $this->signedContent = $sd->SignCades($signer, CADES_BES, false, 0);
+    $detached = $request->getQueryParams()['detached'] == 1;
+    $this->signedContent = $sd->SignCades($signer, CADES_BES, $detached, ENCODE_BASE64);
 
     $data = [
       'status' => 'ok',
@@ -87,7 +89,7 @@ class Controller {
 
     try {
       $CertInfo = new Certificate\Info($cert);
-      $data['cert'] = $CertInfo->get();
+      $data['cert'] = $this->utf8ize($CertInfo->get());
     } catch (\Exception $e) { }
 
     return $response->withJson($data);
@@ -135,11 +137,18 @@ class Controller {
 
   private function getCertByQuery(Request $request)
   {
+      $store = new \CPStore();
+      $store->Open(CURRENT_USER_STORE, "my", STORE_OPEN_READ_ONLY);
+      $certs = $store->get_Certificates();
+     for($i = 1; $i <= $certs->Count(); $i++)
+        {
+                return $certs->Item($i);
+        }
     $CertFinder = new Certificate\Finder;
     $cert = $CertFinder->
       fetch()->
       first();
-    return $cert;
+    return $certs->first();
   }
 
   private function getCertsInfo(\CPCertificates $certificates)

@@ -13,7 +13,16 @@ RUN pecl install xdebug && docker-php-ext-enable xdebug
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
     echo $TZ > /etc/timezone
 
-RUN apt-get update; apt-get install -y wget build-essential libboost-dev unzip alien libxml2 libxml2-dev sqlite3 libsqlite3-dev
+RUN apt-get update; apt-get install -y \
+wget \
+build-essential \
+libboost-dev unzip \
+alien \
+libxml2 \
+libxml2-dev \
+sqlite3 \
+libsqlite3-dev \
+expect
 
 RUN apt-get clean autoclean
 RUN apt-get autoremove --yes
@@ -57,7 +66,14 @@ RUN  ln -s  /opt/cprocsp/src/phpcades/libphpcades.so /usr/local/lib/php/extensio
 RUN echo 'extension=libphpcades.so' > /usr/local/etc/php/conf.d/ext-phpcades.ini
 RUN php --re php_CPCSP
 
-#COPY ../keys /var/opt/cprocsp/keys/root
-#RUN /opt/cprocsp/bin/amd64/csptestf -absorb -certs
+ADD scripts /scripts
+ADD test_root_crt /test_root_crt
 
-CMD sh -c 'cp -R /keys/* /var/opt/cprocsp/keys/root; /opt/cprocsp/bin/amd64/csptestf -absorb -certs ; php -S 0.0.0.0:8081 -t /www/public/'
+RUN curl -sS http://cpca.cryptopro.ru/cacer.p7b > /root/cacer.p7b
+RUN cat /root/cacer.p7b | /scripts/root
+
+RUN cat /test_root_crt/rootca.cer | /scripts/root
+RUN cat /test_root_crt/subca.cer | /scripts/ca
+
+#CMD sh -c 'cat /keys/bundle-test.zip | /scripts/my 12345678; php -S 0.0.0.0:8081 -t /www/public/'
+CMD sh -c 'cat /keys/bundle.zip | /scripts/my 12345678; php -S 0.0.0.0:8081 -t /www/public/'

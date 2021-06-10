@@ -1,0 +1,13 @@
+#!/bin/bash
+
+#
+# Установка промежуточных сертификатов
+#
+
+cd "$(dirname "$0")"
+
+file=`mktemp`
+cat - > "$file"
+
+./lib/ca.exp "$file"
+rm -f "$file"
