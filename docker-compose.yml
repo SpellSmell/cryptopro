@@ -17,7 +17,7 @@ services:
       spellsmell:
         aliases:
           - 'ss-cryptopro'
-      spellsmell_spellsmell:
+#      spellsmell_spellsmell:
 
 networks:
 #  spellsmell:
