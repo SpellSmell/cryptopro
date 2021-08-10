@@ -67,7 +67,7 @@ RUN echo 'extension=libphpcades.so' > /usr/local/etc/php/conf.d/ext-phpcades.ini
 RUN php --re php_CPCSP
 
 ADD scripts /scripts
-ADD test_root_crt /test_root_crt
+#ADD test_root_crt /test_root_crt
 
 RUN curl -sS http://cpca.cryptopro.ru/cacer.p7b > /root/cacer.p7b
 RUN cat /root/cacer.p7b | /scripts/root
