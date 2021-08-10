@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  crypto:
+  php:
     image: spellsmell/cryptopro:latest
     build:
       context: ./php
@@ -11,19 +11,19 @@ services:
     volumes:
       - ./www/:/www
       - ./keys/:/keys
-    #ports:
-    #  - "8095:8081"
+#    ports:
+#      - "8095:8081"
     networks:
       spellsmell:
         aliases:
           - 'ss-cryptopro'
-#      spellsmell_spellsmell:
+      docker-compose_spellsmell:
 
 networks:
-#  spellsmell:
-#    ipam:
-#      config:
-#        - subnet: 172.145.0.0/16
-#  spellsmell_spellsmell:
   spellsmell:
+    ipam:
+      config:
+        - subnet: 172.145.0.0/16
+#  spellsmell_spellsmell:
+  docker-compose_spellsmell:
     external: true
