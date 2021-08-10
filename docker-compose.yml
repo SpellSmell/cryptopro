@@ -14,16 +14,18 @@ services:
 #    ports:
 #      - "8095:8081"
     networks:
-      spellsmell:
+#      spellsmell:
+#        aliases:
+#          - 'ss-cryptopro'
+      docker-compose_spellsmell:
         aliases:
           - 'ss-cryptopro'
-      docker-compose_spellsmell:
 
 networks:
-  spellsmell:
-    ipam:
-      config:
-        - subnet: 172.145.0.0/16
+#  spellsmell:
+#    ipam:
+#      config:
+#        - subnet: 172.145.0.0/16
 #  spellsmell_spellsmell:
   docker-compose_spellsmell:
     external: true
