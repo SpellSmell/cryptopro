@@ -75,5 +75,14 @@ RUN cat /root/cacer.p7b | /scripts/root
 RUN cat /test_root_crt/rootca.cer | /scripts/root
 RUN cat /test_root_crt/subca.cer | /scripts/ca
 
+
+RUN php -r "copy('https://getcomposer.org/installer', '/root/composer-setup.php');"
+RUN php /root/composer-setup.php
+RUN php -r "unlink('composer-setup.php');"
+
+RUN cp ./composer.phar /usr/bin/composer
+
+RUN composer config --global repo.packagist composer https://packagist.org
+
 #CMD sh -c 'cat /keys/bundle-test.zip | /scripts/my 12345678; php -S 0.0.0.0:8081 -t /www/public/'
 CMD sh -c 'cat /keys/bundle_1258.zip | /scripts/my; cat /keys/bundle_169.zip | /scripts/my 12345678;  php -S 0.0.0.0:8081 -t /www/public/'
