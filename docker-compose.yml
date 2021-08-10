@@ -20,9 +20,10 @@ services:
       spellsmell_spellsmell:
 
 networks:
+#  spellsmell:
+#    ipam:
+#      config:
+#        - subnet: 172.145.0.0/16
+#  spellsmell_spellsmell:
   spellsmell:
-    ipam:
-      config:
-        - subnet: 172.145.0.0/16
-  spellsmell_spellsmell:
     external: true
