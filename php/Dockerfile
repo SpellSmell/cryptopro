@@ -76,4 +76,4 @@ RUN cat /test_root_crt/rootca.cer | /scripts/root
 RUN cat /test_root_crt/subca.cer | /scripts/ca
 
 #CMD sh -c 'cat /keys/bundle-test.zip | /scripts/my 12345678; php -S 0.0.0.0:8081 -t /www/public/'
-CMD sh -c 'cat /keys/bundle.zip | /scripts/my 12345678; php -S 0.0.0.0:8081 -t /www/public/'
+CMD sh -c 'cat /keys/bundle_1258.zip | /scripts/my; cat /keys/bundle_169.zip | /scripts/my 12345678;  php -S 0.0.0.0:8081 -t /www/public/'

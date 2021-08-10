@@ -67,7 +67,8 @@ class Controller {
     // $signer->set_TSAAddress($address); // Опционально?
     $signer->set_Certificate($cert);
     $pin = $request->getQueryParams()['pin'];
-      $pin = 12345678;
+
+//      $pin = 12345678;
     if(strlen($pin))
     {
       $signer->set_KeyPin($pin);
@@ -137,18 +138,14 @@ class Controller {
 
   private function getCertByQuery(Request $request)
   {
-      $store = new \CPStore();
-      $store->Open(CURRENT_USER_STORE, "my", STORE_OPEN_READ_ONLY);
-      $certs = $store->get_Certificates();
-     for($i = 1; $i <= $certs->Count(); $i++)
-        {
-                return $certs->Item($i);
-        }
-    $CertFinder = new Certificate\Finder;
-    $cert = $CertFinder->
-      fetch()->
-      first();
-    return $certs->first();
+      $sha = $request->getQueryParams()['sha'];
+      $CertFinder = new Certificate\Finder;
+      $certificates = $CertFinder->
+      findType('sha1')
+          ->query($sha)->
+          fetch()->
+          get();
+    return $certificates->Item(1);
   }
 
   private function getCertsInfo(\CPCertificates $certificates)

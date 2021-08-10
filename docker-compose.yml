@@ -11,8 +11,8 @@ services:
     volumes:
       - ./www/:/www
       - ./keys/:/keys
-    ports:
-      - "8095:8081"
+    #ports:
+    #  - "8095:8081"
     networks:
       spellsmell:
         aliases:
