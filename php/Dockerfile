@@ -39,7 +39,7 @@ tar xvzf csp5devel.tgz && \
 cd csp5devel && \
 dpkg -i lsb-cprocsp-devel_5.0.11863-5_all.deb
 
-RUN wget https://www.cryptopro.ru/sites/default/files/products/cades/current_release_2_0/cades_linux_amd64.tar.gz && \
+RUN wget https://cryptopro.ru/products/cades/plugin/get_2_0 && \
 tar xvzf cades_linux_amd64.tar.gz && \
 cd cades_linux_amd64 && \
 dpkg -i cprocsp-pki-phpcades-64_2.0.14071-1_amd64.deb cprocsp-pki-cades-64_2.0.14071-1_amd64.deb
