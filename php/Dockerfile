@@ -41,10 +41,9 @@ dpkg -i lsb-cprocsp-devel_5.0.11863-5_all.deb
 
 ADD scripts /scripts
 
-ADD cades_linux_amd64.tar.gz cades_linux_amd64.tar.gz
 
 #RUN wget https://cryptopro.ru/products/cades/plugin/get_2_0 && \
-RUN tar xvzf cades_linux_amd64.tar.gz && \
+RUN tar xvzf ~/cades_linux_amd64.tar.gz && \
 cd cades_linux_amd64 && \
 dpkg -i cprocsp-pki-phpcades-64_2.0.14071-1_amd64.deb cprocsp-pki-cades-64_2.0.14071-1_amd64.deb
 
