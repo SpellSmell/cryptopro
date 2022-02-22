@@ -39,8 +39,10 @@ tar xvzf csp5devel.tgz && \
 cd csp5devel && \
 dpkg -i lsb-cprocsp-devel_5.0.11863-5_all.deb
 
-RUN wget https://cryptopro.ru/products/cades/plugin/get_2_0 && \
-tar xvzf cades_linux_amd64.tar.gz && \
+ADD scripts /scripts
+
+#RUN wget https://cryptopro.ru/products/cades/plugin/get_2_0 && \
+RUN tar xvzf cades_linux_amd64.tar.gz && \
 cd cades_linux_amd64 && \
 dpkg -i cprocsp-pki-phpcades-64_2.0.14071-1_amd64.deb cprocsp-pki-cades-64_2.0.14071-1_amd64.deb
 
@@ -66,7 +68,6 @@ RUN  ln -s  /opt/cprocsp/src/phpcades/libphpcades.so /usr/local/lib/php/extensio
 RUN echo 'extension=libphpcades.so' > /usr/local/etc/php/conf.d/ext-phpcades.ini
 RUN php --re php_CPCSP
 
-ADD scripts /scripts
 #ADD test_root_crt /test_root_crt
 
 RUN curl -sS http://cpca.cryptopro.ru/cacer.p7b > /root/cacer.p7b
