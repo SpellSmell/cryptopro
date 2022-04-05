@@ -78,6 +78,7 @@ RUN cat /root/cacer.p7b | /scripts/root
 RUN cat /test_root_crt/rootca.cer | /scripts/root
 RUN cat /test_root_crt/subca.cer | /scripts/ca
 
+
 RUN /opt/cprocsp/bin/amd64/certmgr -inst -store mCa -f /keys/kontur.cer
 RUN /opt/cprocsp/bin/amd64/certmgr -inst -store mRoot -f /keys/min.cer
 
