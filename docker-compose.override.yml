@@ -2,8 +2,8 @@ version: '3'
 
 services:
   php:
-    ports:
-      - "8095:8081"
+#    ports:
+#      - "8095:8081"
     networks:
 #      spellsmell_spellsmell:
       docker-compose_spellsmell:
