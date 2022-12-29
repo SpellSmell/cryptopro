@@ -40,7 +40,6 @@ cd csp5devel && \
 dpkg -i lsb-cprocsp-devel_5.0.11863-5_all.deb
 
 ADD scripts /scripts
-ADD keys /keys
 
 COPY cades_linux_amd64.tar.gz ./
 
@@ -94,4 +93,4 @@ RUN /opt/cprocsp/bin/amd64/certmgr -inst -store mCa -f /keys/kontur.cer
 RUN /opt/cprocsp/bin/amd64/certmgr -inst -store mRoot -f /keys/min.cer
 
 #CMD sh -c 'cat /keys/bundle-test.zip | /scripts/my 12345678; php -S 0.0.0.0:8081 -t /www/public/'
-CMD sh -c 'cat /keys/bundle_1258.zip | /scripts/my; cat /keys/bundle_169.zip | /scripts/my 12345678;  php -S 0.0.0.0:8081 -t /www/public/'
+CMD sh -c '/scripts/init.sh; php -S 0.0.0.0:8081 -t /www/public/'
