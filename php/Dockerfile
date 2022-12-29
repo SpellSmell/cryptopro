@@ -8,7 +8,7 @@ RUN php -v
 
 COPY ./conf.d /usr/local/etc/php/conf.d
 
-RUN pecl install xdebug && docker-php-ext-enable xdebug
+#RUN pecl install xdebug && docker-php-ext-enable xdebug
 
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
     echo $TZ > /etc/timezone
