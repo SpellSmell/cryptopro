@@ -84,13 +84,7 @@ RUN php -r "copy('https://getcomposer.org/installer', '/root/composer-setup.php'
 
 RUN php /root/composer-setup.php
 RUN php -r "unlink('composer-setup.php');"
-
 RUN cp ./composer.phar /usr/bin/composer
-
 RUN composer config --global repo.packagist composer https://packagist.org
 
-RUN /opt/cprocsp/bin/amd64/certmgr -inst -store mCa -f /keys/kontur.cer
-RUN /opt/cprocsp/bin/amd64/certmgr -inst -store mRoot -f /keys/min.cer
-
-#CMD sh -c 'cat /keys/bundle-test.zip | /scripts/my 12345678; php -S 0.0.0.0:8081 -t /www/public/'
 CMD sh -c '/scripts/init.sh; php -S 0.0.0.0:8081 -t /www/public/'
