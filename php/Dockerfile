@@ -34,7 +34,7 @@ RUN cd /tmp/src && \
     tar -xf linux-amd64.tgz && \
     linux-amd64/install.sh
 
-RUN wget https://www.cryptopro.ru/sites/default/files/public/faq/csp/csp5devel.tgz && \
+RUN cd /tmp/src && \
 tar xvzf csp5devel.tgz && \
 cd csp5devel && \
 dpkg -i lsb-cprocsp-devel_5.0.11863-5_all.deb
