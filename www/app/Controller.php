@@ -57,6 +57,47 @@ class Controller {
     return $response->withJson($data);
   }
 
+    public function sign2(Request $request, Response $response, array $args)
+    {
+        $this->getFile($request);
+        $this->checkEmptyFile();
+        $cert = $this->getCertByQuery($request);
+
+        $pin = $request->getQueryParams()['pin'];
+
+        $detached = $request->getQueryParams()['detached'] == 1;
+
+        $fileName = tempnam('/tmp/', 'mess');
+        file_put_contents($fileName, $this->content);
+
+        $sha = $request->getQueryParams()['sha'];
+
+        if($detached){
+            $command =            "/opt/cprocsp/bin/amd64/cryptcp -signf -dir /tmp  -cert -thumbprint \"{$sha}\" -nochain --pin {$pin} {$fileName}";
+            exec($command);
+            $this->signedContent = file_get_contents($fileName.'.sgn');
+        }else{
+            $command =            "/opt/cprocsp/bin/amd64/cryptcp -sign -dir /tmp  -cert -thumbprint \"{$sha}\" -nochain --pin {$pin} {$fileName}";
+            exec($command);
+            $this->signedContent = file_get_contents($fileName.'.sig');
+        }
+//        throw new \Exception();
+
+        exec("/usr/bin/find /tmp -wholename '*mess*' -ctime +1 -delete");
+
+        $data = [
+            'status' => 'ok',
+            'signedContent' => $this->signedContent
+        ];
+
+        try {
+//            $CertInfo = new Certificate\Info($cert);
+//            $data['cert'] = $this->utf8ize($CertInfo->get());
+        } catch (\Exception $e) { }
+
+        return $response->withJson($data);
+    }
+
   public function sign(Request $request, Response $response, array $args)
   {
     $this->getFile($request);
