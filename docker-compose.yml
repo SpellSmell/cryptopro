@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  php:
+  php_crypto:
     image: spellsmell/cryptopro:latest
     build:
       context: ./php
