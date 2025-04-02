@@ -22,11 +22,11 @@ services:
 #        aliases:
 #          - 'ss-cryptopro'
 
-networks:
-  spellsmell:
-    ipam:
-      config:
-        - subnet: 172.145.0.0/16
-  spellsmell_spellsmell:
+#networks:
+#  spellsmell:
+#    ipam:
+#      config:
+#        - subnet: 172.145.0.0/16
+#  spellsmell_spellsmell:
 #  docker-compose_spellsmell:
-    external: true
+#    external: true
