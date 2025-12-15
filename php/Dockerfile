@@ -45,18 +45,6 @@ RUN cd /tmp/src && \
 RUN cd /tmp/src git clone https://github.com/php/php-src.git
 RUN cd /tmp/src/php-src && git checkout PHP-8.1 && ./configure --prefix=/opt/php
 
-RUN php -v
-RUN php -v
-RUN ls -slh /usr/include/php/
-
-#RUN cd /tmp && git clone  https://github.com/CryptoPro/phpcades.git && \
-#    cd phpcades && \
-#    php_dir=$(find /usr/include -name "php.h" 2>/dev/null | xargs dirname | xargs dirname) && \
-#    sed -i "s|^PHPDIR=.*|PHPDIR=$php_dir|" Makefile.unix && eval `/opt/cprocsp/src/doxygen/CSP/../setenv.sh --64`; \
-#    make -f Makefile.unix & php_exts=$(php -i | grep 'extension_dir' | cut -d' ' -f3 | xargs) && \
-#    ln -s $(realpath libphpcades.so) $php_exts && \
-#    echo 'extension=libphpcades.so' >> $(php --ini | sed -n 's/^Loaded Configuration File: *//p')
-
 RUN git clone https://github.com/CryptoPro/phpcades.git
 
 # for development purposes
