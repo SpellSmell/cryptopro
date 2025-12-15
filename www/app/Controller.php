@@ -8,7 +8,12 @@ use Slim\Psr7\Response;
 
 class Controller {
 
-  public function healthcheck(Request $request, Response $response, array $args)
+    /**
+     * @var mixed
+     */
+    private $content;
+
+    public function healthcheck(Request $request, Response $response, array $args)
   {
     return $response->withJson(['status' => 'ok', 'php_sapi_name' => php_sapi_name()]);
   }
