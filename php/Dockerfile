@@ -43,7 +43,7 @@ RUN cd /tmp/src && \
 
 
 RUN cd /tmp/src && git clone https://github.com/php/php-src.git
-RUN cd /tmp/src/php-src && git checkout PHP-8.1 && /tmp/src/configure --prefix=/opt/php
+RUN cd /tmp/src/php-src && git checkout PHP-8.1 && ./buildconf && ./configure --prefix=/opt/php
 
 RUN git clone https://github.com/CryptoPro/phpcades.git
 
