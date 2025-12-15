@@ -3,6 +3,7 @@ version: '3.9'
 services:
   php_crypto:
     image: spellsmell/cryptopro:latest
+    restart: always
     build:
       context: ./php
       network: host
