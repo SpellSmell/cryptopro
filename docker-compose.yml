@@ -6,27 +6,18 @@ services:
     build:
       context: ./php
       network: host
-    environment:
-      XDEBUG_CONFIG: "client_host=${DEV_HOST_IP} client_port=${XDEBUG_PORT}"
-      PHP_IDE_CONFIG: "serverName=cryptopro"
+#    environment:
+#      XDEBUG_CONFIG: "client_host=${DEV_HOST_IP} client_port=${XDEBUG_PORT}"
+#      PHP_IDE_CONFIG: "serverName=cryptopro"
+    networks:
+      spellsmell:
+        ipv4_address: 172.145.0.2
+
     volumes:
       - ./www/:/www
       - ./keys/:/keys
-#    ports:
-#      - "8095:8081"
-#    networks:
-#      spellsmell:
-#        aliases:
-#          - 'ss-cryptopro'
-#      docker-compose_spellsmell:
-#        aliases:
-#          - 'ss-cryptopro'
-
-#networks:
-#  spellsmell:
-#    ipam:
-#      config:
-#        - subnet: 172.145.0.0/16
-#  spellsmell_spellsmell:
-#  docker-compose_spellsmell:
-#    external: true
+networks:
+  spellsmell:
+    ipam:
+      config:
+        - subnet: 172.145.0.0/16

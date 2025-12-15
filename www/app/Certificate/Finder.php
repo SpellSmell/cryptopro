@@ -10,8 +10,12 @@ class Finder {
     'sha1' => CERTIFICATE_FIND_SHA1_HASH,
     'subject' => CERTIFICATE_FIND_SUBJECT_NAME
   ];
+    /**
+     * @var mixed
+     */
+    private $findType;
 
-  public function findType($find_type)
+    public function findType($find_type)
   {
     $this->findType =& self::$findTypeMap[$find_type];
     if(!isset($this->findType))
