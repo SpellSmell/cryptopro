@@ -1,4 +1,9 @@
 <?php
+
+use Slim\Factory\AppFactory;
+
+error_reporting(E_ALL);
+ini_set('display_errors','1');
 if (PHP_SAPI == 'cli-server') {
     // To help the built-in PHP dev server, check if the request was actually for
     // something which should probably be served as a static file
@@ -13,7 +18,8 @@ require __DIR__ . '/../vendor/autoload.php';
 
 // Instantiate the app
 $settings = require __DIR__ . '/settings.php';
-$app = new \Slim\App($settings);
+$app = AppFactory::create();
+
 
 // Set up dependencies
 require __DIR__ . '/dependencies.php';

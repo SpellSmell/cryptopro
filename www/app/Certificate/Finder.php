@@ -4,6 +4,7 @@ namespace App\Certificate;
 
 class Finder {
 
+    private $certs;
   private static $findTypeMap =
   [
     'sha1' => CERTIFICATE_FIND_SHA1_HASH,

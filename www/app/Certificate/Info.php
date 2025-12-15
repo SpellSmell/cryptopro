@@ -15,6 +15,7 @@ namespace App\Certificate;
 
 class Info {
 
+    private  $cert;
   public function __construct(\CPCertificate $cert)
   {
     $this->cert = $cert;

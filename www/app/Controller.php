@@ -2,8 +2,8 @@
 
 namespace App;
 
-use Slim\Http\Request;
-use Slim\Http\Response;
+use Slim\Psr7\Request;
+use Slim\Psr7\Response;
 
 
 class Controller {
@@ -24,7 +24,9 @@ class Controller {
       'certificates' => $this->getCertsInfo($certificates)
     ];
 
-    return $response->withJson($this->utf8ize($data), 200, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    $response->getBody()->write(json_encode($this->utf8ize($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)), 200, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+
+    return $response;
   }
 
   private function utf8ize( $mixed ) {
@@ -33,7 +35,7 @@ class Controller {
               $mixed[$key] = $this->utf8ize($value);
           }
       } elseif (is_string($mixed)) {
-          return mb_convert_encoding($mixed, "UTF-8", "UTF-8");
+          return $mixed;
       }
       return $mixed;
   }
