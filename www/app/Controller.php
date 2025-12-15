@@ -13,11 +13,6 @@ class Controller {
      */
     private $content;
 
-    public function healthcheck(Request $request, Response $response, array $args)
-  {
-    return $response->withJson(['status' => 'ok', 'php_sapi_name' => php_sapi_name()]);
-  }
-
   public function certificates(Request $request, Response $response, array $args)
   {
     $CertFinder = new Certificate\Finder;
@@ -97,52 +92,10 @@ class Controller {
             'signedContent' => $this->signedContent
         ];
 
-        try {
-//            $CertInfo = new Certificate\Info($cert);
-//            $data['cert'] = $this->utf8ize($CertInfo->get());
-        } catch (\Exception $e) { }
+        $response->getBody()->write(json_encode($this->utf8ize($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)), 200, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
 
-        return $response->withJson($data);
+        return $response;
     }
-
-  public function sign(Request $request, Response $response, array $args)
-  {
-    $this->getFile($request);
-    $this->checkEmptyFile();
-    $cert = $this->getCertByQuery($request);
-
-    $signer = new \CPSigner();
-    // $signer->set_TSAAddress($address); // Опционально?
-    $signer->set_Certificate($cert);
-    $pin = $request->getQueryParams()['pin'];
-
-//      $pin = 12345678;
-    if(strlen($pin))
-    {
-      $signer->set_KeyPin($pin);
-    }
-
-    $sd = new \CPSignedData;
-    $sd->set_ContentEncoding(BASE64_TO_BINARY);
-    $sd->set_Content(base64_encode($this->content));
-
-    // Второй параметр - тип подписи(1 = CADES_BES):  http://cpdn.cryptopro.ru/default.asp?url=content/cades/namespace_c_ad_e_s_c_o_m_fe49883d8ff77f7edbeeaf0be3d44c0b_1fe49883d8ff77f7edbeeaf0be3d44c0b.html
-    // Третий параметр detached - отделенная(true) или совмещенная (false)
-    $detached = $request->getQueryParams()['detached'] == 1;
-    $this->signedContent = $sd->SignCades($signer, CADES_BES, $detached, ENCODE_BASE64);
-
-    $data = [
-      'status' => 'ok',
-      'signedContent' => $this->signedContent
-    ];
-
-    try {
-      $CertInfo = new Certificate\Info($cert);
-      $data['cert'] = $this->utf8ize($CertInfo->get());
-    } catch (\Exception $e) { }
-
-    return $response->withJson($data);
-  }
 
   public function verify(Request $request, Response $response, array $args)
   {
@@ -219,8 +172,4 @@ class Controller {
     }
     return $ret;
   }
-
-
-
-
 }
