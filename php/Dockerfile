@@ -53,7 +53,8 @@ RUN git clone https://github.com/CryptoPro/phpcades.git
 WORKDIR /phpcades
 
 RUN php_dir=$(find /usr/include -name "php.h" 2>/dev/null | xargs dirname | xargs dirname) && \
-    sed -i "s|^PHPDIR=.*|PHPDIR=$php_dir|" Makefile.unix
+    sed -i "s|^PHPDIR=.*|PHPDIR=$php_dir|" Makefile.unix && \
+    sed -i 's/ -lcplib//' Makefile.unix
 
 RUN eval `/opt/cprocsp/src/doxygen/CSP/../setenv.sh --64`; \
     make -f Makefile.unix
