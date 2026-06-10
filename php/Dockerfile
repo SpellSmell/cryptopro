@@ -43,15 +43,16 @@ RUN cd /tmp/src && \
     linux-amd64_deb/install.sh  cprocsp-pki-cades-64_2.0.15500-1_amd64.deb cprocsp-pki-phpcades_2.0.15500-1_all.deb lsb-cprocsp-devel_5.0.13600-7_all.deb
 
 
-RUN cd /tmp/src && git clone https://github.com/php/php-src.git
-RUN cd /tmp/src/php-src && git checkout PHP-8.1 && ./buildconf --force && ./configure --prefix=/opt/php
-
 RUN git clone https://github.com/CryptoPro/phpcades.git
 
 # for development purposes
 # COPY * /phpcades/
 
 WORKDIR /phpcades
+
+# В данном дистрибутиве КриптоПро отсутствует libcplib.so, поэтому убираем её
+# из линковки (аналог старого `sed 's/ -lcplib//'` для Makefile.unix)
+RUN sed -i 's/ ${FOUND_LIB_CPLIB}//' src/CMakeLists.txt
 
 RUN make
 
