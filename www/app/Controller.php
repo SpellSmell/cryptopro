@@ -87,6 +87,8 @@ class Controller {
 
         exec("/usr/bin/find /tmp -wholename '*mess*' -ctime +1 -delete");
 
+        $this->signedContent = str_replace(["\r", "\n"], '', $this->signedContent);
+
         $data = [
             'status' => 'ok',
             'signedContent' => $this->signedContent
