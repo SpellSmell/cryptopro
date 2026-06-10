@@ -9,6 +9,7 @@ use Slim\Psr7\Response;
 $app->get('/healthcheck', \App\Controller::class . ':healthcheck');
 
 $app->get('/certificates', [\App\Controller::class , 'certificates']);
+$app->get('/license', [\App\Controller::class , 'license']);
 $app->post('/sign', \App\Controller::class . ':sign');
 $app->post('/sign2', \App\Controller::class . ':sign2');
 $app->post('/cosign', \App\Controller::class . ':cosign');
