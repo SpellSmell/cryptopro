@@ -29,6 +29,46 @@ class Controller {
     return $response;
   }
 
+  public function license(Request $request, Response $response, array $args)
+  {
+    $command = '/opt/cprocsp/sbin/amd64/cpconfig -license -view 2>&1';
+    exec($command, $output, $returnCode);
+
+    $serial = null;
+    $expiresInDays = null;
+    $type = null;
+
+    foreach ($output as $i => $line) {
+      $line = trim($line);
+      if (preg_match('/^Expires:\s*(\d+)\s*day/i', $line, $m)) {
+        $expiresInDays = (int) $m[1];
+      } elseif (preg_match('/^License type:\s*(.+?)\.?$/i', $line, $m)) {
+        $type = trim($m[1]);
+      } elseif (preg_match('/^License validity:/i', $line)) {
+        // Серийный номер лицензии печатается следующей строкой
+        $serial = isset($output[$i + 1]) ? trim($output[$i + 1]) : null;
+      }
+    }
+
+    $expiresDate = null;
+    if ($expiresInDays !== null) {
+      $expiresDate = (new \DateTime())->modify("+{$expiresInDays} day")->format('Y-m-d');
+    }
+
+    $data = [
+      'status' => $returnCode === 0 ? 'ok' : 'error',
+      'serial' => $serial,
+      'type' => $type,
+      'expiresInDays' => $expiresInDays,
+      'expiresDate' => $expiresDate,
+      'raw' => implode("\n", $output),
+    ];
+
+    $response->getBody()->write(json_encode($this->utf8ize($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)), 200, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+
+    return $response;
+  }
+
   private function utf8ize( $mixed ) {
       if (is_array($mixed)) {
           foreach ($mixed as $key => $value) {
