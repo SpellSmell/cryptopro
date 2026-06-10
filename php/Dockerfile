@@ -14,6 +14,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
 RUN apt-get update; apt-get install -y \
 wget \
 build-essential \
+cmake \
 libboost-dev \
 unzip \
 alien \
@@ -52,15 +53,10 @@ RUN git clone https://github.com/CryptoPro/phpcades.git
 
 WORKDIR /phpcades
 
-RUN php_dir=$(find /usr/include -name "php.h" 2>/dev/null | xargs dirname | xargs dirname) && \
-    sed -i "s|^PHPDIR=.*|PHPDIR=$php_dir|" Makefile.unix && \
-    sed -i 's/ -lcplib//' Makefile.unix
-
-RUN eval `/opt/cprocsp/src/doxygen/CSP/../setenv.sh --64`; \
-    make -f Makefile.unix
+RUN make
 
 RUN php_exts=$(php -i | grep 'extension_dir' | cut -d' ' -f3 | xargs) && \
-    ln -s $(realpath libphpcades.so) $php_exts
+    ln -s $(realpath build/src/libphpcades.so) $php_exts
 
 RUN echo 'extension=libphpcades.so' >> $(php --ini | sed -n 's/^Loaded Configuration File: *//p')
 
