@@ -1,5 +1,97 @@
 # КриптоПро 4.0 в докер контейнере
 
+# SpellSmell: сервис подписи для CRM (#48810)
+
+Сервис подписывает запросы и документы CRM (Честный знак, Диадок) ключом ЭЦП компании.
+
+**Он работает только внутри своего хоста и никогда не выставляется в интернет** — ни открыто,
+ни за фаерволом по белому списку. Порты контейнера не публикуются, DNAT на него нет. CRM этого
+же хоста ходит в контейнер по сети своего стека. Если CRM переезжает на другой сервер, cryptopro
+ставится рядом с ней, а не открывается наружу.
+
+Серверы, секреты и порядок обслуживания — во внутренней документации (Workspace CRM,
+папка infrastructure, документ «cryptopro»). Репозиторий публичный: адресов серверов здесь нет.
+
+| | |
+|---|---|
+| Где работает | рядом с рабочей CRM и с каждой резервной |
+| Каталог на сервере | `/docker/cryptopro` — чекаут этого репозитория |
+| Образ | `<registry>/spellsmell/cryptopro:<коммит>` из закрытого registry; код сервиса и vendor внутри образа |
+| Сеть | внешняя сеть стека CRM (`CRM_NETWORK`), свой адрес вне диапазона CRM, алиас `cryptopro` |
+| Адрес для CRM | `https://cryptopro:8443` |
+| HTTPS | stunnel в контейнере с самоподписанным сертификатом (`tls/`) → встроенный сервер PHP на `127.0.0.1:8081` |
+| Авторизация | заголовок `Authorization: Bearer <CRYPTOPRO_API_TOKEN>`; без него или с неверным токеном — 401, токен не задан — 503 |
+| PIN ключа | заголовок `X-Pin`. В строке запроса его нельзя передавать: встроенный сервер PHP пишет строку запроса в лог |
+| Секреты на хосте | `.env` (токен), `keys/` (ключ ЭЦП `alex.zip`, лицензия), `tls/` (сертификат и ключ HTTPS). В git и в образ не попадают (`.gitignore`, `.dockerignore`) |
+
+Методы, которыми пользуется CRM (`backend/modules/nomenclature/modules/markup/components/CryptoClient.php`):
+`GET /healthcheck`, `GET /certificates`, `GET /license`, `POST /sign2?sha=<отпечаток>&detached=0|1`
+(тело — что подписать, PIN — в `X-Pin`). Остальные методы ниже достались от исходного проекта.
+
+## Настройка CRM
+
+`backend/config/common.php`, `params['cryptopro']`: адрес и сертификат, которому CRM доверяет
+(`backend/config/cryptopro.crt` — копия `tls/cryptopro.crt`). Токен — только в
+`common-local.php` узла: `params['cryptopro']['token']`, тот же, что `CRYPTOPRO_API_TOKEN` в `.env`.
+Резервные CRM получают `common-local.php` зеркалом с рабочей, поэтому токен и сертификат на
+всех серверах одинаковые.
+
+## Установка на сервере
+
+```bash
+cd /docker/cryptopro
+cp .env-dist .env && chmod 600 .env   # CRYPTOPRO_IMAGE — образ из registry
+                                      # CRYPTOPRO_API_TOKEN — openssl rand -hex 32 (на первом сервере)
+
+# HTTPS. Сертификат один на все серверы: CRM доверяет ровно ему.
+# Новый сертификат = замена backend/config/cryptopro.crt в CRM.
+mkdir -m 700 tls
+openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 -nodes -days 3650 \
+  -subj "/CN=cryptopro" -addext "subjectAltName=DNS:cryptopro" \
+  -keyout tls/cryptopro.key -out tls/cryptopro.crt
+
+# keys/alex.zip — архив ключа, см. «Установка сертификатов.md»
+mkdir -m 700 keys
+
+docker compose pull && docker compose up -d
+```
+
+На резервные серверы `.env`, `tls/` и `keys/` копируются с рабочего без изменений.
+
+Проверка — из php-контейнера CRM на том же сервере (токен — из `.env`):
+
+```bash
+docker exec docker-compose-php-1 curl -sS --cacert /web_root/backend/config/cryptopro.crt \
+  -H "Authorization: Bearer $TOKEN" https://cryptopro:8443/healthcheck
+# {"status":"ok"}
+```
+
+## Сборка образа
+
+Только вручную, на сервере с `docker login` в registry. Новая сборка — новый тег, тег не
+перезаписывается.
+
+```bash
+cd /docker/cryptopro
+TAG=$(git rev-parse --short HEAD)
+DOCKER_BUILDKIT=1 docker build --network host -f php/Dockerfile \
+  -t $REGISTRY/spellsmell/cryptopro:$TAG .
+docker push $REGISTRY/spellsmell/cryptopro:$TAG
+```
+
+`--network host` нужен потому, что docker на серверах работает с `"iptables": false`.
+
+## Лицензия КриптоПро CSP
+
+Без серийного номера CSP работает по демо-лицензии: 90 дней с установки, то есть со сборки
+образа. Осталось дней — `GET /license`; CRM проверяет это каждый день
+(`CryptoProLicenseExpireCheck`, задача за 21 день). Серийный номер купленной лицензии кладётся
+одной строкой в `keys/license`; `init.sh` применяет его при старте контейнера.
+
+---
+
+Дальше — описание исходного проекта dbfun/cryptopro, часть его устарела.
+
 Содержимое контейнера:
 
 * PHP7 с установленным расширением `libphpcades` (`CPStore`, `CPSigner`, `CPSignedData`)

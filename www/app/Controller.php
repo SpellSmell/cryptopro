@@ -13,6 +13,13 @@ class Controller {
      */
     private $content;
 
+  public function healthcheck(Request $request, Response $response, array $args)
+  {
+    $response->getBody()->write(json_encode(['status' => 'ok']));
+
+    return $response;
+  }
+
   public function certificates(Request $request, Response $response, array $args)
   {
     $CertFinder = new Certificate\Finder;
@@ -105,7 +112,8 @@ class Controller {
         $this->checkEmptyFile();
         $cert = $this->getCertByQuery($request);
 
-        $pin = $request->getQueryParams()['pin'];
+        // PIN — в заголовке, а не в строке запроса: строку запроса встроенный сервер PHP пишет в лог (#48810)
+        $pin = $request->getHeaderLine('X-Pin');
 
         $detached = $request->getQueryParams()['detached'] == 1;
 
@@ -114,12 +122,16 @@ class Controller {
 
         $sha = $request->getQueryParams()['sha'];
 
+        $cryptcpArgs = '-dir /tmp -cert -thumbprint ' . escapeshellarg((string) $sha) . ' -nochain'
+            . ($pin !== '' ? ' --pin ' . escapeshellarg($pin) : '')
+            . ' ' . escapeshellarg($fileName);
+
         if($detached){
-            $command =            "/opt/cprocsp/bin/amd64/cryptcp -signf -dir /tmp  -cert -thumbprint \"{$sha}\" -nochain --pin {$pin} {$fileName}";
+            $command =            "/opt/cprocsp/bin/amd64/cryptcp -signf {$cryptcpArgs}";
             exec($command);
             $this->signedContent = file_get_contents($fileName.'.sgn');
         }else{
-            $command =            "/opt/cprocsp/bin/amd64/cryptcp -sign -dir /tmp  -cert -thumbprint \"{$sha}\" -nochain --pin {$pin} {$fileName}";
+            $command =            "/opt/cprocsp/bin/amd64/cryptcp -sign {$cryptcpArgs}";
             exec($command);
             $this->signedContent = file_get_contents($fileName.'.sig');
         }
