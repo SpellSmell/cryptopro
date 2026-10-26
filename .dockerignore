@@ -1,0 +1,14 @@
+# Секреты сервера — только на хосте, в образ не попадают (#48810)
+keys
+tls
+.env
+# не нужно для сборки
+.git
+.idea
+assets
+certificates
+devel
+www/vendor
+www/logs
+php/cades_linux_amd64.tar.gz
+php/scripts/cades_linux_amd64.tar.gz

@@ -20,6 +20,9 @@ require __DIR__ . '/../vendor/autoload.php';
 $settings = require __DIR__ . '/settings.php';
 $app = AppFactory::create();
 
+// Все запросы — только с токеном (#48810)
+$app->add(new \App\TokenAuth((string) getenv('CRYPTOPRO_API_TOKEN')));
+
 
 // Set up dependencies
 require __DIR__ . '/dependencies.php';

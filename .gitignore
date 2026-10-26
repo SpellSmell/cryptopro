@@ -1,5 +1,7 @@
 /certificates
 /keys
-/www/composer.lock
 /docker-compose.override.local.yml
 /docker-compose.override.yml
+# секреты сервера (#48810)
+/tls
+/.env

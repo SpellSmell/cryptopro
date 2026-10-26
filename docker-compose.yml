@@ -1,24 +1,37 @@
-version: '3.9'
-
+# Сервис подписи КриптоПро для CRM (#48810).
+#
+# Только внутри своего хоста. Порты не публикуются; в интернет сервис не выставляется никогда,
+# в том числе за фаерволом по белому списку. CRM этого же хоста ходит в контейнер по сети своего
+# стека: https://cryptopro:8443 (алиас в сети CRM_NETWORK).
+# Порядок установки — README.md, «Установка на сервере».
 services:
-  php_crypto:
-    image: spellsmell/cryptopro:latest
-    restart: always
+  cryptopro:
+    # Образ — из закрытого registry. Сборка только вручную (README.md), новая сборка — новый тег.
+    image: ${CRYPTOPRO_IMAGE:?CRYPTOPRO_IMAGE не задан в .env}
     build:
-      context: ./php
+      context: .
+      dockerfile: php/Dockerfile
       network: host
-#    environment:
-#      XDEBUG_CONFIG: "client_host=${DEV_HOST_IP} client_port=${XDEBUG_PORT}"
-#      PHP_IDE_CONFIG: "serverName=cryptopro"
-    networks:
-      spellsmell:
-        ipv4_address: 172.145.0.2
-
+    restart: always
+    environment:
+      CRYPTOPRO_API_TOKEN: ${CRYPTOPRO_API_TOKEN:?CRYPTOPRO_API_TOKEN не задан в .env}
     volumes:
-      - ./www/:/www
-      - ./keys/:/keys
+      - ./keys:/keys:ro
+      - ./tls:/tls:ro
+    networks:
+      crm:
+        # Свой адрес вне 172.4.0.x: там стек CRM раздаёт адреса своим контейнерам вручную,
+        # и динамический адрес мог бы занять чужой
+        ipv4_address: 172.4.145.2
+        aliases:
+          - cryptopro
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
 networks:
-  spellsmell:
-    ipam:
-      config:
-        - subnet: 172.145.0.0/16
+  crm:
+    external: true
+    name: ${CRM_NETWORK:-docker-compose_spellsmell}
